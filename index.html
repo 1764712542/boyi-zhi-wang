@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>博弈之王 · 避其锋芒</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=57"></head>
+<body>
+  <div id="app">
+
+    <!-- ===== 欢迎屏 ===== -->
+    <section id="screen-welcome" class="screen active">
+      <div class="welcome-bg"></div>
+      <div class="welcome-content">
+        <div class="ink-drop"></div>
+        <div class="seal-wrapper"><div class="seal">弈</div></div>
+        <h1 class="game-title">
+          <span class="title-char" style="--i:0">博</span>
+          <span class="title-char" style="--i:1">弈</span>
+          <span class="title-char" style="--i:2">之</span>
+          <span class="title-char" style="--i:3">王</span>
+        </h1>
+        <p class="subtitle">避 其 锋 芒</p>
+        <div class="welcome-tagline">
+          <span class="tagline-line"></span>
+          <span class="tagline-text">以退为进 · 以柔克刚</span>
+          <span class="tagline-line"></span>
+        </div>
+        <button class="btn-primary" id="btn-start"><span class="btn-text">开 始 对 弈</span></button>
+        <div class="welcome-actions">
+          <button class="btn-ghost" id="btn-load-save">读 取 存 档</button>
+          <button class="btn-ghost replay-entry-btn" id="btn-replay-list">复 盘 记 录</button>
+          <button class="btn-ghost" id="btn-help">游 戏 图 鉴</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 模式选择屏 ===== -->
+    <section id="screen-mode" class="screen">
+      <div class="screen-header">
+        <div class="header-seal">弈</div>
+        <h2 class="screen-title">选 择 模 式</h2>
+        <p class="screen-desc">与B王对弈，或与好友切磋</p>
+      </div>
+      <div class="mode-options">
+        <div class="mode-card selected" data-mode="pve">
+          <div class="mode-icon">B</div>
+          <h3 class="mode-name">对战B王</h3>
+          <p class="mode-desc">人机对战，三种难度，体验剧情</p>
+        </div>
+        <div class="mode-card" data-mode="pvp">
+          <div class="mode-icon">双</div>
+          <h3 class="mode-name">双人对战</h3>
+          <p class="mode-desc">同设备轮流，各选角色，公平竞技</p>
+        </div>
+        <div class="mode-card" data-mode="online">
+          <div class="mode-icon">联</div>
+          <h3 class="mode-name">联机对战</h3>
+          <p class="mode-desc">局域网联机，创建/加入房间</p>
+        </div>
+        <div class="mode-card" data-mode="three">
+          <div class="mode-icon">英</div>
+          <h3 class="mode-name">三英战B王</h3>
+          <p class="mode-desc">三将轮换，共抗狂妄B王 · 极限挑战</p>
+        </div>
+        <div class="mode-card" data-mode="story">
+          <div class="mode-icon">史</div>
+          <h3 class="mode-name">故事模式</h3>
+          <p class="mode-desc">讨伐B王的史诗剧情 · 7章冒险</p>
+        </div>
+        <div class="mode-card disabled" data-mode="formation">
+          <div class="mode-icon">阵</div>
+          <h3 class="mode-name">阵营对战</h3>
+          <p class="mode-desc">五大阵营，被动联动，策略对决</p>
+          <div class="mode-locked">即 将 开 放</div>
+        </div>
+        <div class="mode-card disabled" data-mode="4v4">
+          <div class="mode-icon">四</div>
+          <h3 class="mode-name">4v4 多人对战</h3>
+          <p class="mode-desc">一张棋盘兼容多个阵容，互相攻伐</p>
+          <div class="mode-locked">即 将 开 放</div>
+        </div>
+        <div class="mode-card" data-mode="codex">
+          <div class="mode-icon">册</div>
+          <h3 class="mode-name">角色图鉴</h3>
+          <p class="mode-desc">全角色技能详解 · 克制攻略</p>
+        </div>
+      </div>
+      <div class="screen-nav">
+        <button class="btn-ghost" id="mode-back">返回</button>
+      </div>
+    </section>
+
+    <!-- ===== 选将屏 ===== -->
+    <section id="screen-character" class="screen">
+      <div class="screen-header">
+        <div class="header-seal">将</div>
+        <h2 class="screen-title" id="char-select-title">择 将 出 征</h2>
+        <p class="screen-desc" id="char-select-desc">选择你的化身，踏入棋局 · 各有奇术</p>
+      </div>
+      <div class="char-nav">
+        <button class="char-nav-btn" id="char-prev" aria-label="上一页">‹</button>
+        <span class="char-nav-info" id="char-page-info">1 / 2</span>
+        <button class="char-nav-btn" id="char-next" aria-label="下一页">›</button>
+      </div>
+      <div class="character-cards" id="character-cards"></div>
+      <div class="char-pagination" id="char-pagination"></div>
+      <div class="screen-nav">
+        <button class="btn-ghost" id="char-back">返回</button>
+      </div>
+    </section>
+
+    <!-- ===== 角色介绍页（弹层） ===== -->
+    <div class="char-detail-overlay" id="char-detail">
+      <div class="char-detail-card">
+        <div class="detail-left">
+          <div class="detail-portrait-wrap">
+            <div class="detail-portrait" id="detail-portrait"></div>
+            <div class="detail-portrait-char" id="detail-char"></div>
+          </div>
+          <h2 class="detail-name" id="detail-name"></h2>
+          <div class="detail-title-text" id="detail-title"></div>
+        </div>
+        <div class="detail-right">
+          <div class="detail-section">
+            <h3 class="detail-section-title">背景</h3>
+            <p class="detail-desc" id="detail-desc"></p>
+          </div>
+          <div class="detail-section">
+            <h3 class="detail-section-title">奇术</h3>
+            <div class="detail-skill">
+              <div class="detail-skill-header">
+                <span class="detail-skill-name" id="detail-skill-name"></span>
+                <span class="detail-skill-cd" id="detail-skill-cd"></span>
+              </div>
+              <p class="detail-skill-desc" id="detail-skill-desc"></p>
+            </div>
+          </div>
+          <div class="detail-section">
+            <h3 class="detail-section-title">属性</h3>
+            <div class="detail-stats">
+              <div class="detail-stat"><span class="stat-label">攻</span><div class="stat-bar" id="detail-atk"></div><span class="stat-val" id="detail-atk-val"></span></div>
+              <div class="detail-stat"><span class="stat-label">守</span><div class="stat-bar" id="detail-def"></div><span class="stat-val" id="detail-def-val"></span></div>
+              <div class="detail-stat"><span class="stat-label">谋</span><div class="stat-bar" id="detail-int"></div><span class="stat-val" id="detail-int-val"></span></div>
+            </div>
+          </div>
+          <div class="detail-section">
+            <h3 class="detail-section-title">台词</h3>
+            <div class="detail-lines" id="detail-lines"></div>
+          </div>
+          <div class="detail-section">
+            <h3 class="detail-section-title">被动技能（二选一）</h3>
+            <div class="passive-options" id="passive-options"></div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn-ghost" id="detail-back">返 回</button>
+            <button class="btn-primary" id="detail-confirm">选 择 此 角 色</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 选将屏 · 技能选择面板（点击角色弹出） ===== -->
+    <div id="skill-select-overlay" class="skill-select-overlay" style="display:none;">
+      <div class="skill-select-modal">
+        <div class="skill-select-header">
+          <h3 id="skill-select-char-name"></h3>
+          <button id="skill-select-close" class="skill-select-close" aria-label="关闭">×</button>
+        </div>
+        <div class="skill-select-section">
+          <div class="skill-select-title">主动技能（选1）</div>
+          <div id="skill-select-actives" class="skill-select-list"></div>
+        </div>
+        <div class="skill-select-section">
+          <div class="skill-select-title">被动技能（选1）</div>
+          <div id="skill-select-passives" class="skill-select-list"></div>
+        </div>
+        <div class="skill-select-actions">
+          <button id="skill-select-confirm" class="btn-primary-small">确 认 选 将</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 联机设置屏 ===== -->
+    <section id="screen-network" class="screen">
+      <div class="screen-header">
+        <div class="header-seal">联</div>
+        <h2 class="screen-title">联 机 对 战</h2>
+        <p class="screen-desc">局域网联机 · 与好友远程切磋</p>
+      </div>
+      <div class="net-options">
+        <div class="net-card selected" data-net="host">
+          <div class="net-icon">创</div>
+          <h3 class="net-name">创建房间</h3>
+          <p class="net-desc">作为主机创建房间，等待好友加入</p>
+        </div>
+        <div class="net-card" data-net="join">
+          <div class="net-icon">入</div>
+          <h3 class="net-name">加入房间</h3>
+          <p class="net-desc">输入主机IP地址，连接好友</p>
+        </div>
+      </div>
+      <div class="net-setup" id="net-host-setup">
+        <div class="net-input-group">
+          <label class="net-input-label">房间名称（可选）</label>
+          <input type="text" class="net-input" id="net-host-name" placeholder="博弈之王房间" maxlength="20">
+        </div>
+        <div class="net-input-group">
+          <label class="net-input-label">房间密码（可选，留空则无密码）</label>
+          <input type="text" class="net-input" id="net-host-password" placeholder="设置密码" maxlength="16">
+        </div>
+        <div class="net-info-box">
+          <div class="net-info-label">你的房间地址</div>
+          <div class="net-info-value" id="net-host-ip">等待创建...</div>
+          <div class="net-info-hint" id="net-host-hint">点击下方按钮创建房间</div>
+        </div>
+        <button class="btn-primary" id="btn-host-create">创 建 房 间</button>
+      </div>
+      <div class="net-setup" id="net-join-setup" style="display:none">
+        <div class="net-input-group">
+          <label class="net-input-label">主机 IP 地址</label>
+          <input type="text" class="net-input" id="net-join-ip" placeholder="主机IP 或 粘贴邀请码">
+        </div>
+        <div class="net-input-group">
+          <label class="net-input-label">房间密码（如主机设置了密码）</label>
+          <input type="text" class="net-input" id="net-join-password" placeholder="输入房间密码" maxlength="16">
+        </div>
+        <button class="btn-primary" id="btn-join-connect">连 接 房 间</button>
+        <div class="net-status" id="net-join-status"></div>
+        <div class="net-discovery">
+          <div class="net-discovery-header">
+            <span class="net-discovery-title">局域网房间</span>
+            <button class="net-refresh-btn" id="btn-net-refresh">搜 索</button>
+          </div>
+          <div class="net-room-list" id="net-room-list">
+            <div class="net-room-empty">点击「搜索」查找局域网房间</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-nav">
+        <button class="btn-ghost" id="net-back">返回</button>
+      </div>
+    </section>
+
+    <!-- ===== 让子+难度屏 ===== -->
+    <section id="screen-handicap" class="screen">
+      <div class="screen-header">
+        <div class="header-seal">局</div>
+        <h2 class="screen-title">定 局 设 难</h2>
+        <p class="screen-desc">选择让子与B王难度</p>
+      </div>
+      <div class="setup-section">
+        <h3 class="setup-label">让子</h3>
+        <div class="handicap-options">
+          <div class="handicap-card selected" data-handicap="none">
+            <div class="hc-piece-display"><div class="mini-piece red">帥</div></div>
+            <h4 class="hc-name">不让子</h4>
+            <p class="hc-desc">公平对弈</p>
+          </div>
+          <div class="handicap-card" data-handicap="one-horse">
+            <div class="hc-piece-display"><div class="mini-piece red dim">馬</div></div>
+            <h4 class="hc-name">让一马</h4>
+            <p class="hc-desc">稍增险阻</p>
+          </div>
+          <div class="handicap-card" data-handicap="two-horses">
+            <div class="hc-piece-display"><div class="mini-piece red dim">馬</div><div class="mini-piece red dim">馬</div></div>
+            <h4 class="hc-name">让双马</h4>
+            <p class="hc-desc">双马尽失</p>
+          </div>
+          <div class="handicap-card" data-handicap="one-rook">
+            <div class="hc-piece-display"><div class="mini-piece red dim">車</div></div>
+            <h4 class="hc-name">让一车</h4>
+            <p class="hc-desc">舍车之威</p>
+          </div>
+        </div>
+      </div>
+      <div class="setup-section">
+        <h3 class="setup-label">B王装逼等级</h3>
+        <div class="difficulty-options">
+          <div class="difficulty-card selected" data-difficulty="easy">
+            <div class="diff-badge">青铜</div>
+            <h4 class="diff-name">B王 · 青铜装</h4>
+            <p class="diff-desc">萌新装逼，偶有失误</p>
+            <div class="diff-skill">奇术 · 装逼：仅动嘴不动手</div>
+          </div>
+          <div class="difficulty-card" data-difficulty="medium">
+            <div class="diff-badge">钻石</div>
+            <h4 class="diff-name">B王 · 钻石装</h4>
+            <p class="diff-desc">熟练装逼，暗藏杀机</p>
+            <div class="diff-skill">奇术 · 赖皮：撤销你的一步</div>
+          </div>
+          <div class="difficulty-card" data-difficulty="hard">
+            <div class="diff-badge">王者</div>
+            <h4 class="diff-name">B王 · 王者装</h4>
+            <p class="diff-desc">特级装逼，深不可测</p>
+            <div class="diff-skill">奇术 · 洞察：看穿你的意图</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-nav">
+        <button class="btn-ghost" id="hand-back">返回</button>
+        <button class="btn-primary" id="hand-confirm">入 局</button>
+      </div>
+    </section>
+
+    <!-- ===== 对弈屏 ===== -->
+    <section id="screen-game" class="screen">
+      <div class="game-layout">
+        <aside class="game-sidebar game-sidebar-left">
+          <div class="player-card opponent-card">
+            <div class="player-avatar avatar-black"><span class="avatar-char">B</span></div>
+            <div class="player-info-text">
+              <div class="player-name" id="ai-name">B 王</div>
+              <div class="player-title" id="ai-title">深不可测</div>
+              <div class="player-captured" id="black-captured"></div>
+            </div>
+          </div>
+          <div class="skill-cooldown" id="ai-skill-cd">
+            <div class="scd-label">B王奇术</div>
+            <div class="scd-dots" id="ai-skill-dots"></div>
+            <div class="scd-name" id="ai-skill-name">嘲讽</div>
+          </div>
+          <div class="side-panel" id="opp-side-panel">
+            <div class="side-panel-section">
+              <div class="side-panel-title">被动技能</div>
+              <div id="opp-passive-detail" class="side-passive-detail">
+                <div class="side-empty">—</div>
+              </div>
+            </div>
+            <div class="side-panel-section">
+              <div class="side-panel-title">状态</div>
+              <div id="opp-buff-detail" class="side-buff-detail">
+                <div class="side-empty">无</div>
+              </div>
+            </div>
+          </div>
+          <div class="turn-indicator" id="turn-indicator">
+            <div class="turn-dot"></div>
+            <span class="turn-text">轮到你了</span>
+          </div>
+        </aside>
+
+        <div class="board-wrapper">
+          <div class="speech-bubble opp-bubble" id="ai-speech">
+            <div class="speech-content" id="ai-speech-text"></div>
+            <div class="speech-tail"></div>
+          </div>
+          <div class="speech-bubble self-bubble" id="player-speech">
+            <div class="speech-content" id="player-speech-text"></div>
+            <div class="speech-tail"></div>
+          </div>
+          <div class="board-frame">
+            <canvas id="board-canvas"></canvas>
+            <div class="thinking-overlay" id="thinking-overlay">
+              <div class="thinking-content">
+                <div class="thinking-seal">B</div>
+                <span class="thinking-text">B王 思考中</span>
+              </div>
+            </div>
+          </div>
+          <div class="check-warning" id="check-warning">将 军</div>
+          <!-- 棋子操作菜单：进攻 / 详情 -->
+          <div id="piece-action-menu" class="piece-action-menu" style="display:none;">
+            <button class="action-btn action-attack" id="piece-action-attack">进 攻</button>
+            <button class="action-btn action-detail" id="piece-action-detail">详 情</button>
+          </div>
+        </div>
+
+        <div id="game-hud" class="game-hud">
+          <div class="hud-section hud-buffs">
+            <div class="hud-title">状态</div>
+            <div id="hud-buff-list" class="hud-buff-list"></div>
+          </div>
+          <div class="hud-section hud-charattrs">
+            <div class="hud-title">属性</div>
+            <div id="hud-charattrs" class="hud-charattrs-content"></div>
+          </div>
+          <div class="hud-section hud-selected">
+            <div class="hud-title">选中</div>
+            <div id="hud-selected-piece" class="hud-selected-content"><div class="hud-empty">点击棋子查看</div></div>
+          </div>
+          <div class="hud-section hud-skills">
+            <div class="hud-title">技能</div>
+            <div id="hud-skill-status" class="hud-skill-status"></div>
+          </div>
+          <div class="hud-section hud-passives">
+            <div class="hud-title">被动</div>
+            <div id="hud-passive-status" class="hud-skill-status"></div>
+          </div>
+          <div class="hud-section hud-stats">
+            <div class="hud-title">兵力</div>
+            <div id="hud-red-stats" class="hud-stats-content"></div>
+            <div id="hud-black-stats" class="hud-stats-content"></div>
+          </div>
+          <div class="hud-section hud-hint">
+            <div class="hud-title">相克</div>
+            <div id="hud-type-hint" class="hud-type-hint"></div>
+          </div>
+        </div>
+
+        <aside class="game-sidebar game-sidebar-right">
+          <div class="player-card self-card">
+            <div class="player-avatar avatar-red" id="player-avatar"><span class="avatar-char" id="player-avatar-char">侯</span></div>
+            <div class="player-info-text">
+              <div class="player-name" id="player-name">侯智博</div>
+              <div class="player-title" id="player-style">智计百出</div>
+              <div class="player-captured" id="red-captured"></div>
+            </div>
+          </div>
+          <div class="skill-panel" id="skill-panel">
+            <div class="skill-name" id="skill-name">奇术</div>
+            <div class="skill-desc" id="skill-desc">技能描述</div>
+            <button class="skill-btn" id="btn-skill" disabled>
+              <span class="skill-btn-text">释放</span>
+              <span class="skill-btn-cd" id="skill-cd-text">就绪</span>
+            </button>
+          </div>
+          <div class="side-panel" id="my-side-panel">
+            <div class="side-panel-section">
+              <div class="side-panel-title">被动技能</div>
+              <div id="my-passive-detail" class="side-passive-detail">
+                <div class="side-empty">—</div>
+              </div>
+            </div>
+            <div class="side-panel-section">
+              <div class="side-panel-title">状态</div>
+              <div id="my-buff-detail" class="side-buff-detail">
+                <div class="side-empty">无</div>
+              </div>
+            </div>
+          </div>
+          <div class="three-heroes-panel" id="three-heroes-panel" style="display:none">
+            <div class="th-label">三英 · 当前：<span id="th-active-name">—</span></div>
+            <div class="th-heroes" id="th-heroes"></div>
+            <button class="btn-ghost th-switch-btn" id="btn-th-switch">切换武将（不耗回合）</button>
+          </div>
+          <div class="game-controls">
+            <button class="ctrl-btn" id="btn-undo"><span class="ctrl-icon">悔</span><span class="ctrl-label">悔棋</span></button>
+            <button class="ctrl-btn" id="btn-restart"><span class="ctrl-icon">重</span><span class="ctrl-label">重开</span></button>
+            <button class="ctrl-btn" id="btn-resign"><span class="ctrl-icon">降</span><span class="ctrl-label">认输</span></button>
+            <button class="ctrl-btn" id="btn-game-back"><span class="ctrl-icon">返</span><span class="ctrl-label">返回</span></button>
+            <button class="ctrl-btn audio-toggle" id="btn-bgm"><span class="ctrl-icon">乐</span><span class="ctrl-label">音乐</span></button>
+            <button class="ctrl-btn audio-toggle" id="btn-voice"><span class="ctrl-icon">声</span><span class="ctrl-label">语音</span></button>
+          </div>
+          <div class="save-controls">
+            <button class="save-btn" id="btn-save"><span class="save-icon">存</span><span class="save-label">保存</span></button>
+            <button class="save-btn" id="btn-load"><span class="save-icon">读</span><span class="save-label">读取</span></button>
+          </div>
+          <div class="move-history">
+            <div class="history-title">棋谱</div>
+            <div class="history-list" id="history-list"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===== 结局屏 ===== -->
+    <section id="screen-result" class="screen">
+      <div class="result-content">
+        <div class="result-splash" id="result-splash"></div>
+        <div class="result-seal" id="result-seal">胜</div>
+        <h2 class="result-title" id="result-title">胜</h2>
+        <p class="result-desc" id="result-desc">运筹帷幄之中，决胜千里之外</p>
+        <div class="result-quote" id="result-quote"></div>
+        <div class="result-stats" id="result-stats"></div>
+        <div class="result-actions">
+          <button class="btn-primary" id="btn-again">再 战 一 局</button>
+          <button class="btn-ghost" id="btn-result-replay">查 看 复 盘</button>
+          <button class="btn-ghost" id="btn-save-record">保 存 记 录</button>
+          <button class="btn-ghost" id="btn-home">返回主界面</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 绝杀全屏遮罩 ===== -->
+    <div class="mate-overlay" id="mate-overlay">
+      <div class="mate-content">
+        <div class="mate-seal" id="mate-seal">绝</div>
+        <h2 class="mate-title" id="mate-title">绝 杀</h2>
+        <p class="mate-desc" id="mate-desc">胜负已定，无解可破</p>
+        <button class="btn-primary" id="btn-mate-confirm">确 认</button>
+      </div>
+    </div>
+
+    <!-- ===== 复盘列表屏 ===== -->
+    <section id="screen-replay-list" class="screen">
+      <div class="screen-header">
+        <div class="header-seal">谱</div>
+        <h2 class="screen-title">对 局 复 盘</h2>
+        <p class="screen-desc">回顾历史对局 · 复盘精进</p>
+      </div>
+      <div class="replay-list" id="replay-list"></div>
+      <div class="screen-nav">
+        <button class="btn-ghost" id="replay-list-back">返回</button>
+      </div>
+    </section>
+
+    <!-- ===== 复盘播放屏 ===== -->
+    <section id="screen-replay" class="screen">
+      <div class="screen-header">
+        <div class="header-seal">谱</div>
+        <h2 class="screen-title">复 盘 回 放</h2>
+        <p class="screen-desc" id="replay-info">对局信息</p>
+      </div>
+      <div class="replay-viewer">
+        <canvas id="replay-canvas"></canvas>
+      </div>
+      <div class="replay-controls">
+        <button class="replay-ctrl-btn" id="btn-replay-start" title="开头">⏮</button>
+        <button class="replay-ctrl-btn" id="btn-replay-prev" title="上一步">◀</button>
+        <button class="replay-ctrl-btn replay-play-btn" id="btn-replay-play" title="播放">▶</button>
+        <button class="replay-ctrl-btn" id="btn-replay-next" title="下一步">▶</button>
+        <button class="replay-ctrl-btn" id="btn-replay-end" title="结尾">⏭</button>
+      </div>
+      <div class="replay-progress-wrap">
+        <input type="range" class="replay-bar" id="replay-bar" min="0" max="0" value="0">
+        <span class="replay-progress" id="replay-progress">0 / 0</span>
+      </div>
+      <div class="screen-nav">
+        <button class="btn-ghost" id="replay-back">返回列表</button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ===== 角色图鉴弹层 ===== -->
+  <div class="help-overlay" id="boss-info-overlay">
+    <div class="help-modal boss-info-modal">
+      <div class="help-header">
+        <h2 class="help-title">角色图鉴</h2>
+        <button class="help-close" id="btn-boss-close">×</button>
+      </div>
+      <div class="help-body" id="boss-info-body">
+        <!-- 由 JS 动态填充 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 故事模式章节弹层 ===== -->
+  <div class="help-overlay" id="story-overlay">
+    <div class="help-modal">
+      <div class="help-header">
+        <h2 class="help-title" id="story-title">故事模式 · 讨伐B王</h2>
+        <button class="help-close" id="btn-story-close">×</button>
+      </div>
+      <div class="help-body" id="story-body"></div>
+      <div class="screen-nav" id="story-nav"></div>
+    </div>
+  </div>
+
+  <!-- ===== PVP Ban 位屏 ===== -->
+  <section id="screen-ban" class="screen">
+    <div class="screen-header">
+      <div class="header-seal">禁</div>
+      <h2 class="screen-title">禁 用 角 色</h2>
+      <p class="screen-desc" id="ban-desc">红方禁用 · 第 1 轮</p>
+    </div>
+    <div class="char-grid" id="ban-grid"></div>
+    <div class="screen-nav">
+      <button class="btn-ghost" id="ban-back">返回</button>
+    </div>
+  </section>
+
+  <!-- ===== 棋子详情弹层 ===== -->
+  <div class="piece-detail-overlay" id="piece-detail-overlay" style="display:none;">
+    <div class="piece-detail-modal">
+      <div class="piece-detail-header">
+        <span class="piece-detail-title" id="piece-detail-title"></span>
+        <button class="piece-detail-close" id="piece-detail-close" aria-label="关闭">×</button>
+      </div>
+      <div class="piece-detail-body" id="piece-detail-body"></div>
+      <div class="piece-detail-footer">
+        <button class="btn-ghost" id="piece-detail-ok">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 新手教程弹层 ===== -->
+  <div id="tutorial-overlay" class="tutorial-overlay" style="display:none;">
+    <div class="tutorial-modal">
+      <div class="tutorial-step-indicator">第 <span id="tutorial-step-num">1</span>/<span id="tutorial-step-total">8</span> 步</div>
+      <h3 id="tutorial-title" class="tutorial-title"></h3>
+      <p id="tutorial-content" class="tutorial-content"></p>
+      <div class="tutorial-nav">
+        <button id="tutorial-prev" class="btn-ghost">上一步</button>
+        <button id="tutorial-next" class="btn-primary-small">下一步</button>
+        <button id="tutorial-skip" class="btn-text-link">跳过教程</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模块化加载：数据 → 引擎 → 形象 → 音频 → 被动 → 主逻辑 -->
+  <script src="js/data.js?v=57"></script>
+  <script src="js/engine.js?v=57"></script>
+  <script src="js/portrait.js?v=57"></script>
+  <script src="js/audio.js?v=57"></script>
+  <script src="js/skills.js?v=57"></script>
+  <script src="game.js?v=57"></script>
+</body>
+</html>
