@@ -1079,19 +1079,19 @@ body::after {
 
 .game-layout {
   display: flex; align-items: flex-start;
-  justify-content: space-between;
+  justify-content: center;
   gap: 10px;
   padding: 2px 4px;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1180px;
   margin: 0 auto;
 }
 
-/* v24: 棋盘容器占主导，让两侧 sidebar 更紧凑
-   v40: space-between 让 sidebar 贴屏幕两侧，棋盘居中，消除右侧空白 */
+/* v24: 棋盘容器占主导，让两侧 sidebar 更紧凑 */
 .board-wrapper {
   position: relative;
   flex: 0 0 auto;
+  margin: 0 auto;
 }
 
 /* v22: 顶部横向总栏 — 全局信息（回合/规则/相克/兵力/天气）
@@ -1109,7 +1109,7 @@ body::after {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin-bottom: 8px;
-  width: 100%;
+  width: 592px;
   box-sizing: border-box;
 }
 /* 第一行：回合 + 天气（左对齐） / 双方兵力（右对齐） */
@@ -1558,6 +1558,7 @@ body::after {
 .board-frame {
   position: relative;
   padding: 16px;
+  width: fit-content;
   background:
     radial-gradient(ellipse at 50% 50%, #d4b574 0%, #c4a050 100%);
   border-radius: 12px;
@@ -1808,12 +1809,12 @@ body::after {
   flex-wrap: nowrap; gap: 6px;
   margin-top: 8px;
   padding: 6px 8px;
+  width: fit-content;
   background: rgba(240,230,210,0.92);
   border: 1px solid rgba(26,23,20,0.08);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(26,23,20,0.06);
   backdrop-filter: blur(6px);
-  width: fit-content;
   margin-left: auto;
   margin-right: auto;
 }
