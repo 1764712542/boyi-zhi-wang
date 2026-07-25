@@ -1079,17 +1079,16 @@ body::after {
 
 .game-layout {
   display: flex; align-items: flex-start;
-  justify-content: center;
+  justify-content: space-between;
   gap: 10px;
   padding: 2px 4px;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
 /* v24: 棋盘容器占主导，让两侧 sidebar 更紧凑
-   v40: 移除 margin:0 auto（它会将 sidebar 推到边缘造成大间隙），
-        改由父级 justify-content:center 统一居中整个布局组 */
+   v40: space-between 让 sidebar 贴屏幕两侧，棋盘居中，消除右侧空白 */
 .board-wrapper {
   position: relative;
   flex: 0 0 auto;
