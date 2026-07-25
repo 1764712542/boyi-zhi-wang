@@ -25,7 +25,9 @@ const PORTRAIT_STYLES = {
   liujiawei:   { shape:'shield',  accent:'mountain' },
   yuanqingshan:{ shape:'round',   accent:'mist' },
   luolunjie:   { shape:'flame',   accent:'blade' },
-  daaixianzun: { shape:'halo',    accent:'lotus' }
+  daaixianzun: { shape:'halo',    accent:'lotus' },
+  /* v34: 通天教主 — 截教之主，水晶八面体 + 诛仙雷霆 */
+  tongtian:    { shape:'crystal', accent:'thunder' }
 };
 
 /* 颜色工具：调亮/调暗 hex */
@@ -60,6 +62,9 @@ function faceShape(shape, color, light, dark){
       return `<path d="M40 6 Q50 20 48 32 Q58 28 56 44 Q64 50 58 60 Q50 72 40 72 Q30 72 22 60 Q16 50 24 44 Q22 28 32 32 Q30 20 40 6 Z" fill="${color}" stroke="${dark}" stroke-width="2"/><path d="M40 6 Q50 20 48 32 Q58 28 56 44 Q64 50 58 60 Q50 72 40 72 Q30 72 22 60 Q16 50 24 44 Q22 28 32 32 Q30 20 40 6 Z" fill="${light}" opacity="0.2"/>`;
     case 'halo':
       return `<circle cx="40" cy="44" r="24" fill="${color}" stroke="${dark}" stroke-width="2"/><ellipse cx="40" cy="16" rx="18" ry="4" fill="none" stroke="${light}" stroke-width="2.5"/>`;
+    /* v34: 通天教主 — 水晶八面体（通天彻地之晶） */
+    case 'crystal':
+      return `<path d="M40 6 L70 22 L70 58 L40 74 L10 58 L10 22 Z M40 6 L40 74 M10 22 L70 58 M70 22 L10 58" fill="${color}" stroke="${dark}" stroke-width="2"/><path d="M40 6 L70 22 L70 58 L40 74 L10 58 L10 22 Z" fill="${light}" opacity="0.18"/><path d="M40 6 L40 74 M10 22 L70 58 M70 22 L10 58" stroke="${light}" stroke-width="1.2" opacity="0.7"/>`;
     case 'round':
     default:
       return `<circle cx="40" cy="40" r="30" fill="${color}" stroke="${dark}" stroke-width="2"/><circle cx="40" cy="40" r="30" fill="${light}" opacity="0.15"/>`;
@@ -105,6 +110,9 @@ function accentPattern(accent, color, light, dark){
       return `<path d="M9 68 L20 52 L23 54 L12 70 Z" fill="${light}" opacity="0.9"/><path d="M23 68 L12 52 L9 54 L20 70 Z" fill="${light}" opacity="0.9"/>`;
     case 'lotus':
       return `<path d="M16 66 Q11 58 16 53 Q21 58 16 66 Z" fill="${light}" opacity="0.9"/><path d="M22 68 Q17 60 22 55 Q27 60 22 68 Z" fill="${light}" opacity="0.75"/><path d="M10 68 Q5 60 10 55 Q15 60 10 68 Z" fill="${light}" opacity="0.75"/>`;
+    /* v34: 通天教主 — 诛仙雷霆（闪电图案） */
+    case 'thunder':
+      return `<path d="M20 52 L14 64 L18 64 L12 72 L24 60 L20 60 L26 52 Z" fill="${light}" opacity="0.95"/><path d="M28 56 L24 64 L28 64 L24 72" stroke="${light}" stroke-width="1.4" fill="none" opacity="0.8"/>`;
     default:
       return `<circle cx="15" cy="60" r="3.5" fill="${light}" opacity="0.75"/>`;
   }
@@ -141,14 +149,29 @@ function getPortrait(id, color, glow){
 }
 window.__getPortraitSvg__ = getPortraitSvg;
 
-/* 设置对局界面头像：innerHTML 注入 SVG（取代旧的 background-image） */
+/* 设置对局界面头像：注入 SVG（取代旧的 background-image）
+   v22: 保留 avatar-char span（id=player-avatar-char），避免 startNewGame
+   第二次调用 setAvatarPortrait 后再访问 player-avatar-char 报 null */
 function setAvatarPortrait(avatarEl, charId){
   if(!avatarEl || !charId || !CHARACTERS[charId]) return;
-  avatarEl.innerHTML = getPortraitSvg(charId);
+  const ch = CHARACTERS[charId];
+  const charText = ch.char || (charId.charAt(0).toUpperCase());
+  /* 保留可能存在的旧 .avatar-char（含 id=player-avatar-char），避免 DOM 丢失 */
+  const existingChar = avatarEl.querySelector('.avatar-char');
+  if(existingChar){
+    /* 仅更新 SVG，保留原 span（及其 id） */
+    existingChar.textContent = charText;
+    /* 移除旧的 portrait-svg，再注入新 SVG */
+    avatarEl.querySelectorAll('.portrait-svg').forEach(el=>el.remove());
+    avatarEl.insertAdjacentHTML('beforeend', getPortraitSvg(charId));
+  } else {
+    /* 没有 .avatar-char：重新构造完整结构 */
+    avatarEl.innerHTML = `<span class="avatar-char">${charText}</span>${getPortraitSvg(charId)}`;
+  }
   avatarEl.classList.add('has-portrait');
 }
 function clearAvatarPortrait(avatarEl){
   if(!avatarEl) return;
-  avatarEl.innerHTML = '';
+  avatarEl.innerHTML='';
   avatarEl.classList.remove('has-portrait');
 }

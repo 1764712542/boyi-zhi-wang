@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=57"></head>
+  <link rel="stylesheet" href="style.css?v=75"></head>
 <body>
   <div id="app">
 
@@ -72,7 +72,7 @@
         <div class="mode-card" data-mode="story">
           <div class="mode-icon">史</div>
           <h3 class="mode-name">故事模式</h3>
-          <p class="mode-desc">讨伐B王的史诗剧情 · 7章冒险</p>
+          <p class="mode-desc">讨伐B王的史诗剧情 · 20章冒险</p>
         </div>
         <div class="mode-card disabled" data-mode="formation">
           <div class="mode-icon">阵</div>
@@ -85,11 +85,6 @@
           <h3 class="mode-name">4v4 多人对战</h3>
           <p class="mode-desc">一张棋盘兼容多个阵容，互相攻伐</p>
           <div class="mode-locked">即 将 开 放</div>
-        </div>
-        <div class="mode-card" data-mode="codex">
-          <div class="mode-icon">册</div>
-          <h3 class="mode-name">角色图鉴</h3>
-          <p class="mode-desc">全角色技能详解 · 克制攻略</p>
         </div>
       </div>
       <div class="screen-nav">
@@ -155,7 +150,7 @@
             <div class="detail-lines" id="detail-lines"></div>
           </div>
           <div class="detail-section">
-            <h3 class="detail-section-title">被动技能（二选一）</h3>
+            <h3 class="detail-section-title" id="passive-section-title">被动技能</h3>
             <div class="passive-options" id="passive-options"></div>
           </div>
           <div class="detail-actions">
@@ -281,25 +276,25 @@
         </div>
       </div>
       <div class="setup-section">
-        <h3 class="setup-label">B王装逼等级</h3>
+        <h3 class="setup-label">B王显摆等级</h3>
         <div class="difficulty-options">
           <div class="difficulty-card selected" data-difficulty="easy">
             <div class="diff-badge">青铜</div>
             <h4 class="diff-name">B王 · 青铜装</h4>
-            <p class="diff-desc">萌新装逼，偶有失误</p>
-            <div class="diff-skill">奇术 · 装逼：仅动嘴不动手</div>
+            <p class="diff-desc">萌新显摆，偶有失误</p>
+            <div class="diff-skill">奇术 · 傲慢·目中无人</div>
           </div>
           <div class="difficulty-card" data-difficulty="medium">
             <div class="diff-badge">钻石</div>
             <h4 class="diff-name">B王 · 钻石装</h4>
-            <p class="diff-desc">熟练装逼，暗藏杀机</p>
-            <div class="diff-skill">奇术 · 赖皮：撤销你的一步</div>
+            <p class="diff-desc">熟练显摆，暗藏杀机</p>
+            <div class="diff-skill">奇术 · 傲慢·目中无人、贪婪·夺人所爱</div>
           </div>
           <div class="difficulty-card" data-difficulty="hard">
             <div class="diff-badge">王者</div>
             <h4 class="diff-name">B王 · 王者装</h4>
-            <p class="diff-desc">特级装逼，深不可测</p>
-            <div class="diff-skill">奇术 · 洞察：看穿你的意图</div>
+            <p class="diff-desc">特级显摆，深不可测</p>
+            <div class="diff-skill">奇术 · 傲慢·目中无人、贪婪·夺人所爱 等5个</div>
           </div>
         </div>
       </div>
@@ -321,10 +316,19 @@
               <div class="player-captured" id="black-captured"></div>
             </div>
           </div>
-          <div class="skill-cooldown" id="ai-skill-cd">
-            <div class="scd-label">B王奇术</div>
-            <div class="scd-dots" id="ai-skill-dots"></div>
-            <div class="scd-name" id="ai-skill-name">嘲讽</div>
+          <!-- v22: B王技能池列表（按难度展示所有可用技能+描述+CD状态） -->
+          <div class="opp-skill-pool" id="opp-skill-pool">
+            <div class="opp-skill-pool-title">B王奇术池</div>
+            <div id="opp-skill-pool-list" class="opp-skill-pool-list"></div>
+          </div>
+          <!-- v23: 黑方技能释放面板（仅 PVP 模式下显示，供黑方玩家释放技能） -->
+          <div class="opp-skill-panel" id="opp-skill-panel" style="display:none;">
+            <div class="opp-skill-name" id="opp-skill-name">奇术</div>
+            <div class="opp-skill-desc" id="opp-skill-desc">技能描述</div>
+            <button class="opp-skill-btn" id="btn-opp-skill" disabled>
+              <span class="skill-btn-text">释放</span>
+              <span class="skill-btn-cd" id="opp-skill-cd-text">—</span>
+            </button>
           </div>
           <div class="side-panel" id="opp-side-panel">
             <div class="side-panel-section">
@@ -340,13 +344,36 @@
               </div>
             </div>
           </div>
-          <div class="turn-indicator" id="turn-indicator">
-            <div class="turn-dot"></div>
-            <span class="turn-text">轮到你了</span>
-          </div>
         </aside>
 
         <div class="board-wrapper">
+          <!-- v31: 顶部横向总栏（两行布局） — 回合/天气 + 相克/双方兵力 -->
+          <div class="top-status-bar">
+            <!-- 第一行：回合 + 天气 + 双方兵力 -->
+            <div class="top-row-main">
+              <div class="top-turn" id="top-turn-indicator">
+                <div class="turn-dot"></div>
+                <span class="turn-text">轮到你了</span>
+              </div>
+              <div class="top-weather" id="top-weather" title="天气系统">
+                <span class="weather-icon" id="weather-icon">☀</span>
+                <span class="weather-name" id="weather-name">晴</span>
+              </div>
+            </div>
+            <div class="top-row-stats">
+              <span class="top-stats-item"><span class="ts-label">红</span><span id="hud-red-stats-top"></span></span>
+              <span class="top-stats-sep">·</span>
+              <span class="top-stats-item"><span class="ts-label">黑</span><span id="hud-black-stats-top"></span></span>
+            </div>
+            <!-- 第二行：相克提示 + 天气效果说明 -->
+            <div class="top-row-hint">
+              <span class="top-hint-label">相克</span>
+              <span id="hud-type-hint" class="hud-type-hint"></span>
+              <span class="top-hint-sep">|</span>
+              <span class="top-hint-label">天气</span>
+              <span id="hud-weather-effect" class="hud-weather-effect">—</span>
+            </div>
+          </div>
           <div class="speech-bubble opp-bubble" id="ai-speech">
             <div class="speech-content" id="ai-speech-text"></div>
             <div class="speech-tail"></div>
@@ -370,40 +397,20 @@
             <button class="action-btn action-attack" id="piece-action-attack">进 攻</button>
             <button class="action-btn action-detail" id="piece-action-detail">详 情</button>
           </div>
-        </div>
-
-        <div id="game-hud" class="game-hud">
-          <div class="hud-section hud-buffs">
-            <div class="hud-title">状态</div>
-            <div id="hud-buff-list" class="hud-buff-list"></div>
-          </div>
-          <div class="hud-section hud-charattrs">
-            <div class="hud-title">属性</div>
-            <div id="hud-charattrs" class="hud-charattrs-content"></div>
-          </div>
-          <div class="hud-section hud-selected">
-            <div class="hud-title">选中</div>
-            <div id="hud-selected-piece" class="hud-selected-content"><div class="hud-empty">点击棋子查看</div></div>
-          </div>
-          <div class="hud-section hud-skills">
-            <div class="hud-title">技能</div>
-            <div id="hud-skill-status" class="hud-skill-status"></div>
-          </div>
-          <div class="hud-section hud-passives">
-            <div class="hud-title">被动</div>
-            <div id="hud-passive-status" class="hud-skill-status"></div>
-          </div>
-          <div class="hud-section hud-stats">
-            <div class="hud-title">兵力</div>
-            <div id="hud-red-stats" class="hud-stats-content"></div>
-            <div id="hud-black-stats" class="hud-stats-content"></div>
-          </div>
-          <div class="hud-section hud-hint">
-            <div class="hud-title">相克</div>
-            <div id="hud-type-hint" class="hud-type-hint"></div>
+          <!-- v23: 棋盘下方控制按钮（统一横向布局） -->
+          <div class="bottom-controls">
+            <button class="ctrl-btn" id="btn-undo"><span class="ctrl-icon">悔</span><span class="ctrl-label">悔棋</span></button>
+            <button class="ctrl-btn" id="btn-restart"><span class="ctrl-icon">重</span><span class="ctrl-label">重开</span></button>
+            <button class="ctrl-btn" id="btn-resign"><span class="ctrl-icon">降</span><span class="ctrl-label">认输</span></button>
+            <button class="ctrl-btn" id="btn-save"><span class="ctrl-icon">存</span><span class="ctrl-label">保存</span></button>
+            <button class="ctrl-btn" id="btn-load"><span class="ctrl-icon">读</span><span class="ctrl-label">读取</span></button>
+            <button class="ctrl-btn audio-toggle" id="btn-bgm"><span class="ctrl-icon">乐</span><span class="ctrl-label">音乐</span></button>
+            <button class="ctrl-btn audio-toggle" id="btn-voice"><span class="ctrl-icon">声</span><span class="ctrl-label">语音</span></button>
+            <button class="ctrl-btn" id="btn-game-back"><span class="ctrl-icon">返</span><span class="ctrl-label">返回</span></button>
           </div>
         </div>
 
+        <!-- v22: 中间 game-hud 已移除，双方信息分布在左右 sidebar，全局信息在顶部栏 -->
         <aside class="game-sidebar game-sidebar-right">
           <div class="player-card self-card">
             <div class="player-avatar avatar-red" id="player-avatar"><span class="avatar-char" id="player-avatar-char">侯</span></div>
@@ -423,6 +430,12 @@
           </div>
           <div class="side-panel" id="my-side-panel">
             <div class="side-panel-section">
+              <div class="side-panel-title">选中棋子</div>
+              <div id="hud-selected-piece" class="side-selected-detail">
+                <div class="side-empty">点击棋子查看</div>
+              </div>
+            </div>
+            <div class="side-panel-section">
               <div class="side-panel-title">被动技能</div>
               <div id="my-passive-detail" class="side-passive-detail">
                 <div class="side-empty">—</div>
@@ -440,24 +453,27 @@
             <div class="th-heroes" id="th-heroes"></div>
             <button class="btn-ghost th-switch-btn" id="btn-th-switch">切换武将（不耗回合）</button>
           </div>
-          <div class="game-controls">
-            <button class="ctrl-btn" id="btn-undo"><span class="ctrl-icon">悔</span><span class="ctrl-label">悔棋</span></button>
-            <button class="ctrl-btn" id="btn-restart"><span class="ctrl-icon">重</span><span class="ctrl-label">重开</span></button>
-            <button class="ctrl-btn" id="btn-resign"><span class="ctrl-icon">降</span><span class="ctrl-label">认输</span></button>
-            <button class="ctrl-btn" id="btn-game-back"><span class="ctrl-icon">返</span><span class="ctrl-label">返回</span></button>
-            <button class="ctrl-btn audio-toggle" id="btn-bgm"><span class="ctrl-icon">乐</span><span class="ctrl-label">音乐</span></button>
-            <button class="ctrl-btn audio-toggle" id="btn-voice"><span class="ctrl-icon">声</span><span class="ctrl-label">语音</span></button>
-          </div>
-          <div class="save-controls">
-            <button class="save-btn" id="btn-save"><span class="save-icon">存</span><span class="save-label">保存</span></button>
-            <button class="save-btn" id="btn-load"><span class="save-icon">读</span><span class="save-label">读取</span></button>
-          </div>
           <div class="move-history">
             <div class="history-title">棋谱</div>
             <div class="history-list" id="history-list"></div>
           </div>
         </aside>
       </div>
+
+      <!-- ===== 战斗日志面板（v22 新增） ===== -->
+      <div class="battle-log-panel" id="battle-log-panel">
+        <div class="battle-log-header">
+          <span class="battle-log-title">战 报</span>
+          <div class="battle-log-actions">
+            <button class="battle-log-btn" id="btn-battle-log-clear" title="清空">清</button>
+            <button class="battle-log-btn" id="btn-battle-log-collapse" title="折叠">—</button>
+          </div>
+        </div>
+        <div class="battle-log-body" id="battle-log-body">
+          <div class="battle-log-empty">— 战斗事件将显示于此 —</div>
+        </div>
+      </div>
+      <button class="battle-log-toggle" id="btn-battle-log-toggle" title="战报">战报</button>
     </section>
 
     <!-- ===== 结局屏 ===== -->
@@ -468,9 +484,14 @@
         <h2 class="result-title" id="result-title">胜</h2>
         <p class="result-desc" id="result-desc">运筹帷幄之中，决胜千里之外</p>
         <div class="result-quote" id="result-quote"></div>
+        <!-- v31: 故事模式胜利后的剧情对话容器 -->
+        <div class="result-story-dialog" id="result-story-dialog" style="display:none;"></div>
         <div class="result-stats" id="result-stats"></div>
         <div class="result-actions">
           <button class="btn-primary" id="btn-again">再 战 一 局</button>
+          <!-- v10: 故事模式胜利后「下一章 / 完成故事 / 重玩此章」便捷按钮 -->
+          <button class="btn-primary" id="btn-result-next-chapter" style="display:none;">下 一 章</button>
+          <button class="btn-ghost" id="btn-result-replay-chapter" style="display:none;">重 玩 此 章</button>
           <button class="btn-ghost" id="btn-result-replay">查 看 复 盘</button>
           <button class="btn-ghost" id="btn-save-record">保 存 记 录</button>
           <button class="btn-ghost" id="btn-home">返回主界面</button>
@@ -596,11 +617,11 @@
   </div>
 
   <!-- 模块化加载：数据 → 引擎 → 形象 → 音频 → 被动 → 主逻辑 -->
-  <script src="js/data.js?v=57"></script>
-  <script src="js/engine.js?v=57"></script>
-  <script src="js/portrait.js?v=57"></script>
-  <script src="js/audio.js?v=57"></script>
-  <script src="js/skills.js?v=57"></script>
-  <script src="game.js?v=57"></script>
+  <script src="js/data.js?v=75"></script>
+  <script src="js/engine.js?v=75"></script>
+  <script src="js/portrait.js?v=75"></script>
+  <script src="js/audio.js?v=75"></script>
+  <script src="js/skills.js?v=75"></script>
+  <script src="game.js?v=75"></script>
 </body>
 </html>
