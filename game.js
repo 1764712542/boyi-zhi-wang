@@ -6664,6 +6664,8 @@ function showStoryMenu(){
 function startStoryChapter(chId){
   const ch=STORY_CHAPTERS.find(c=>c.id===chId);
   if(!ch) return;
+  /* v40 修复: 从「下一章」按钮调用时 story-overlay 是隐藏的，必须显示 */
+  document.getElementById('story-overlay').classList.add('show');
   /* 展示剧情 */
   const body=document.getElementById('story-body');
   let html=`<div class="boss-section"><h3>${ch.title}</h3><p style="font-size:13px;color:var(--ink-soft)">${ch.desc}</p></div>`;
