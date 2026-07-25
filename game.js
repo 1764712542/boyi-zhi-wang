@@ -6707,19 +6707,18 @@ function startStoryChapter(chId){
       renderCharacterCards();
       showScreen('screen-character');
     } else if(ch.playerChar){
-      /* v39: 章节指定角色 — 跳过选将屏，直接使用章节设定角色
-         剧情对话已展示玩家所扮演角色，无需再走选将流程
-         技能选择沿用 skillState.selected 中保存的索引（首次为默认0） */
+      /* v39: 章节指定角色 — 角色已由剧情指定，但技能选择仍需玩家操作
+         v40 修复: 改为弹出技能选择面板（原直接 confirmCharacterSelect 跳过技能选择） */
       const pc = ch.playerChar;
       const pcChar = CHARACTERS[pc];
       if(pcChar){
+        /* 若该角色尚未配置技能选择，初始化为默认索引 0 */
+        if(!skillState.selected[pc]){
+          skillState.selected[pc] = { active:0, passive:0 };
+        }
         /* 短暂延迟让 story-overlay 完成淡出，避免视觉跳动 */
         setTimeout(()=>{
-          /* 若该角色尚未配置技能选择，初始化为默认索引 0 */
-          if(!skillState.selected[pc]){
-            skillState.selected[pc] = { active:0, passive:0 };
-          }
-          confirmCharacterSelect(pc);
+          showSkillSelectPanel(pc);
         }, 300);
       } else {
         /* 兜底：playerChar 无效时回退到选将屏 */
