@@ -1083,15 +1083,16 @@ body::after {
   gap: 10px;
   padding: 2px 4px;
   width: 100%;
-  max-width: 1180px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
-/* v24: 棋盘容器占主导，让两侧 sidebar 更紧凑 */
+/* v24: 棋盘容器占主导，让两侧 sidebar 更紧凑
+   v40: 移除 margin:0 auto（它会将 sidebar 推到边缘造成大间隙），
+        改由父级 justify-content:center 统一居中整个布局组 */
 .board-wrapper {
   position: relative;
   flex: 0 0 auto;
-  margin: 0 auto;
 }
 
 /* v22: 顶部横向总栏 — 全局信息（回合/规则/相克/兵力/天气）
@@ -1109,7 +1110,7 @@ body::after {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin-bottom: 8px;
-  width: 592px;
+  width: 100%;
   box-sizing: border-box;
 }
 /* 第一行：回合 + 天气（左对齐） / 双方兵力（右对齐） */

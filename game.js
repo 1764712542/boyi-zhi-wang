@@ -3069,7 +3069,7 @@ function usePlayerSkill(){
       }
       addBattleLog('skill', '<b>浩然正气</b> 复活2子+额外回合');
       break;
-    case 'lockdown': // 解宇轩·因果律锁（锁定对方一颗棋子3回合不能移动）
+    case 'lockdown': // 解宇轩·因果律锁（锁定对方一颗棋子4回合不能移动）
       {
         const oc=oppColor();
         const cand=[];
